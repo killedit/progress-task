@@ -29,5 +29,10 @@ COPY docker/php/conf.d/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 # Ensure proper permissions
 RUN chown -R www-data:www-data /var/www/html
 
+# RUN chmod -R 775 storage bootstrap/cache
+
+# RUN php artisan migrate --force && \
+#     php artisan db:seed --force
+
 EXPOSE 9000
 CMD ["php-fpm"]

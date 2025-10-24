@@ -9,12 +9,16 @@ services:
     working_dir: /var/www/html
     volumes:
       - ./laravel:/var/www/html
+      - ./laravel/storage:/var/www/html/storage
+      - ./laravel/bootstrap/cache:/var/www/html/bootstrap/cache
+      - ./docker/php/entrypoint.sh:/usr/local/bin/entrypoint.sh:ro
     env_file:
       - ./laravel/.env
     networks:
       - progress_net
     depends_on:
       - mysql
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]
 
   nginx:
     image: nginx:alpine
@@ -35,9 +39,13 @@ services:
     container_name: progress_vuejs
     restart: unless-stopped
     ports:
-      - "8087:80" # Vue app served by Nginx
+      # #UNCOMMENT
+      # - "8087:80" # Vue app served by Nginx
+      # #COMMENT OUT
+      - "8087:5173" # Vite dev server port
     volumes:
       - ./vuejs:/app # only needed for live-editing
+      - /app/node_modules  # Prevent host node_modules override
     networks:
       - progress_net
     depends_on:
