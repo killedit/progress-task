@@ -22,8 +22,5 @@ export const getCurrentUser = () => {
 
 export const authHeader = () => {
   const token = localStorage.getItem('token')
-  if (token) {
-    return { Authorization: `Bearer ${token}` }
-  }
-  return {}
+  return token ? { Authorization: `Bearer ${token}` } : {}
 }

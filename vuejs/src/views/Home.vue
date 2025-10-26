@@ -21,10 +21,9 @@
             <a class="btn btn-sm btn-outline-primary me-2" href="/login">Login</a>
             <a class="btn btn-sm btn-primary" href="/register">Register</a>
           </template>
-
           <!-- Logged-in buttons -->
           <template v-else>
-            <span class="me-3">Welcome, {{ user.name || 'User' }}</span>
+            <span class="me-3">Welcome, {{ user?.name || 'User' }}</span>
             <button class="btn btn-sm btn-outline-danger" @click="logout">Logout</button>
           </template>
         </div>
@@ -63,17 +62,14 @@
           <td>
             <template v-if="isAuthenticated">
 
-              <button class="btn btn-sm btn-warning me-2" @click="editTask(task)">🖉 Edit</button>
+			<button class="btn btn-sm btn-warning me-2" @click="editTask(task)">🖉 Edit</button>
 
-              <!-- <button class="btn btn-sm btn-danger me-2" @click="deleteTask(task.id)">🗑 Delete</button> -->
-              <button v-if="userToken" class="btn btn-sm btn-danger" @click="deleteTaskItem(task.id)"> 🗑 Delete</button>
-              
-              <!-- <button class="btn btn-sm" :class="task.is_completed ? 'btn-secondary' : 'btn-success'" @click="toggleComplete(task)">{{ task.is_completed ? 'Undo Complete' : 'Complete' }}</button> -->
-              <button v-if="userToken" class="btn btn-sm" :class="task.is_completed ? 'btn-secondary' : 'btn-success'" @click="toggleComplete(task.id)">
-
-                <span v-if="!task.is_completed">Complete</span>
-                <span v-else>Undo Complete</span>
-              </button>
+			<button class="btn btn-sm btn-danger" @click="deleteTaskItem(task.id)">🗑 Delete</button>
+            
+			<button class="btn btn-sm" :class="task.is_completed ? 'btn-secondary' : 'btn-success'" @click="toggleComplete(task.id)">
+				<span v-if="!task.is_completed">Complete</span>
+				<span v-else>Undo Complete</span>
+			</button>
 
             </template>
             <template v-else>
@@ -99,72 +95,82 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getTasks, deleteTask, toggleCompleteTask } from '../services/TaskService'
 
-const tasks = ref([])
-const pagination = ref({})
-const loading = ref(true)
-const user = ref(JSON.parse(localStorage.getItem('user')) || null)
-const isAuthenticated = ref(!!localStorage.getItem('token'))
+	const user = ref({})
 
+	import { ref, onMounted } from 'vue'
+	import { getTasks, deleteTask, toggleCompleteTask } from '../services/TaskService'
 
-const loadTasks = async (page = 1) => {
-  try {
-    loading.value = true
-    const data = await getTasks(page)
-    tasks.value = data.data
-    pagination.value = data
-  } catch (err) {
-    console.error('Failed to load tasks:', err)
-  } finally {
-    loading.value = false
-  }
-}
+	const isAuthenticated = ref(false)
 
-const changePage = (page) => {
-  loadTasks(page)
-}
+	const tasks = ref([])
+	const pagination = ref({})
+	const loading = ref(true)
 
-const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleString()
-}
+// console.log(user);
 
-// Simulated actions
-const addTask = () => alert('TODO: Add task form/modal')
-const editTask = (task) => alert(`TODO: Edit task ${task.id}`)
-const deleteTaskItem = async (id) => {
-  try {
-    await deleteTask(id)
-    await loadTasks()
-  } catch (err) {
-    console.error('Failed to delete task:', err)
-  }
-}
+	const loadTasks = async (page = 1) => {
+		try {
+			loading.value = true
+			const data = await getTasks(page)
+			tasks.value = data.data
+			pagination.value = data
+		} catch (err) {
+			console.error('Failed to load tasks:', err)
+		} finally {
+			loading.value = false
+		}
+	}
 
-const toggleComplete = async (id) => {
-  try {
-    await toggleCompleteTask(id)
-    await loadTasks()
-  } catch (err) {
-    console.error('Failed to toggle complete:', err)
-  }
-}
+	const changePage = (page) => {
+		loadTasks(page)
+	}
 
-const logout = () => {
-  localStorage.removeItem('user')
-  user.value = null
-  isAuthenticated.value = false
-}
+	const formatDate = (dateString) => {
+		return new Date(dateString).toLocaleString()
+	}
 
-onMounted(() => {
-  user.value = JSON.parse(localStorage.getItem('user'))
-  isAuthenticated.value = !!localStorage.getItem('token')
-  loadTasks()
-})
+	// Simulated actions
+	const addTask = () => alert('TODO: Add task form/modal')
+	const editTask = (task) => alert(`TODO: Edit task ${task.id}`)
+	const deleteTaskItem = async (id) => {
+		try {
+			if (!confirm('Are you sure?')) return
+			await deleteTask(id)
+			await loadTasks()
+		} catch (err) {
+			console.error('Failed to delete task:', err)
+		}
+	}
 
+	const toggleComplete = async (id) => {
+		try {
+			await toggleCompleteTask(id)
+			await loadTasks()
+		} catch (err) {
+			console.error('Failed to toggle complete:', err)
+		}
+	}
+
+	const logout = () => {
+		localStorage.removeItem('user')
+		localStorage.removeItem('token')
+		user.value = {}
+		isAuthenticated.value = false
+	}
+
+	onMounted(() => {
+		const storedUser = localStorage.getItem('user')
+  		const storedToken = localStorage.getItem('token')
+  
+		user.value =  storedUser ? JSON.parse(localStorage.getItem('user')) : {}
+		isAuthenticated.value = !!storedToken
+
+		loadTasks()
+	})
 
 </script>
+
 
 <style>
 .container {
