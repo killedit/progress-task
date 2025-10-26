@@ -1,95 +1,90 @@
 <template>
-  <div class="container mt-5"> 
+  	<div class="container mt-5"> 
     <h2 class="mb-4 text-left">Task List</h2>
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-md mb-3">
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <!-- Add new task button (only visible when logged in) -->
-        <a
-          v-if="isAuthenticated"
-          class="btn btn-success btn-sm me-2"
-          href="#"
-          @click.prevent="addTask"
-        >
-          <i class="bi bi-plus-circle"></i> + Add a new task
-        </a>
+      	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 
-        <div class="ms-auto d-flex align-items-center">
-          <!-- Guest buttons -->
-          <template v-if="!isAuthenticated">
-            <a class="btn btn-sm btn-outline-primary me-2" href="/login">Login</a>
-            <a class="btn btn-sm btn-primary" href="/register">Register</a>
-          </template>
-          <!-- Logged-in buttons -->
-          <template v-else>
-            <span class="me-3">Welcome, {{ user?.name || 'User' }}</span>
-            <button class="btn btn-sm btn-outline-danger" @click="logout">Logout</button>
-          </template>
-        </div>
-      </div>
+			<a v-if="isAuthenticated" class="btn btn-success btn-sm me-2" href="`/tasks/create`" @click.prevent="addTask"><i class="bi bi-plus-circle"></i> + Add a new task</a>
+
+			<div class="ms-auto d-flex align-items-center">
+
+				<!-- Guest buttons -->
+				<template v-if="!isAuthenticated">
+					<a class="btn btn-sm btn-outline-primary me-2" href="/login">Login</a>
+					<a class="btn btn-sm btn-primary" href="/register">Register</a>
+				</template>
+
+				<!-- Logged-in buttons -->
+				<template v-else>
+					<span class="me-3">Welcome, {{ user?.name || 'User' }}</span>
+					<button class="btn btn-sm btn-outline-danger" @click="logout">Logout</button>
+				</template>
+			</div>
+      	</div>
     </nav>
 
     <!-- Task table -->
     <div v-if="loading" class="text-center">
-      <p>Loading tasks...</p>
+      	<p>Loading tasks...</p>
     </div>
+
     <table v-else class="table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Title</th>
-          <th>Description</th>
-          <th>Assigned To</th>
-          <th>Created By</th>
-          <th>Due Date</th>
-          <th>Completed</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="task in tasks" :key="task.id">
-          <td>{{ task.id }}</td>
-          <td>{{ task.title }}</td>
-          <td>{{ task.description }}</td>
-          <td>{{ task.assigned_to }}</td>
-          <td>{{ task.created_by }}</td>
-          <td>{{ formatDate(task.due_date) }}</td>
-          <td>
-            <span v-if="task.is_completed" class="badge bg-success">Yes</span>
-            <span v-else class="badge bg-secondary">No</span>
-          </td>
-          <td>
-            <template v-if="isAuthenticated">
+      	<thead>
+			<tr>
+				<th>ID</th>
+				<th>Title</th>
+				<th>Description</th>
+				<th>Assigned To</th>
+				<th>Created By</th>
+				<th>Due Date</th>
+				<th>Completed</th>
+				<th>Actions</th>
+			</tr>
+      	</thead>
+			<tbody>
+				<tr v-for="task in tasks" :key="task.id">
+					<td>{{ task.id }}</td>
+					<td>{{ task.title }}</td>
+					<td>{{ task.description }}</td>
+					<td>{{ task.assigned_user.name || task.assigned_to }}</td>
+					<td>{{ task.created_by_user.name || task.created_by }}</td>
+					<td>{{ formatDate(task.due_date) }}</td>
+					<td>
+						<span v-if="task.is_completed" class="badge bg-success">Yes</span>
+						<span v-else class="badge bg-secondary">No</span>
+					</td>
+					<td>
+						<template v-if="isAuthenticated">
 
-			<button class="btn btn-sm btn-warning me-2" @click="editTask(task)">🖉 Edit</button>
+							<button class="btn btn-sm btn-warning me-2" @click="editTask(task.id)">🖉 Edit</button>
 
-			<button class="btn btn-sm btn-danger" @click="deleteTaskItem(task.id)">🗑 Delete</button>
-            
-			<button class="btn btn-sm" :class="task.is_completed ? 'btn-secondary' : 'btn-success'" @click="toggleComplete(task.id)">
-				<span v-if="!task.is_completed">Complete</span>
-				<span v-else>Undo Complete</span>
-			</button>
-
-            </template>
-            <template v-else>
-              <small class="text-muted">Login to manage</small>
-            </template>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+							<button class="btn btn-sm btn-danger" @click="deleteTaskItem(task.id)">🗑 Delete</button>
+							
+							<button class="btn btn-sm" :class="task.is_completed ? 'btn-secondary' : 'btn-success'" @click="toggleComplete(task.id)">
+								<span v-if="!task.is_completed">Complete</span>
+								<span v-else>Undo Complete</span>
+							</button>
+						</template>
+						<template v-else>
+							<small class="text-muted">Login to manage</small>
+						</template>
+					</td>
+				</tr>
+      		</tbody>
+    	</table>
 
     <!-- Pagination -->
     <nav v-if="pagination.total > pagination.per_page" class="d-flex justify-content-center">
-      <ul class="pagination">
-        <li class="page-item" :class="{ disabled: !pagination.prev_page_url }">
-          <button class="page-link" @click="changePage(pagination.current_page - 1)">Previous</button>
-        </li>
-        <li class="page-item" :class="{ disabled: !pagination.next_page_url }">
-          <button class="page-link" @click="changePage(pagination.current_page + 1)">Next</button>
-        </li>
-      </ul>
+		<ul class="pagination">
+			<li class="page-item" :class="{ disabled: !pagination.prev_page_url }">
+				<button class="page-link" @click="changePage(pagination.current_page - 1)">Previous</button>
+			</li>
+			<li class="page-item" :class="{ disabled: !pagination.next_page_url }">
+				<button class="page-link" @click="changePage(pagination.current_page + 1)">Next</button>
+			</li>
+		</ul>
     </nav>
   </div>
 </template>
@@ -100,19 +95,22 @@
 
 	import { ref, onMounted } from 'vue'
 	import { getTasks, deleteTask, toggleCompleteTask } from '../services/TaskService'
+	import { useRouter } from 'vue-router'
 
 	const isAuthenticated = ref(false)
 
 	const tasks = ref([])
 	const pagination = ref({})
 	const loading = ref(true)
-
-// console.log(user);
+	const router = useRouter()
 
 	const loadTasks = async (page = 1) => {
 		try {
 			loading.value = true
 			const data = await getTasks(page)
+
+// console.log(data);
+
 			tasks.value = data.data
 			pagination.value = data
 		} catch (err) {
@@ -130,9 +128,14 @@
 		return new Date(dateString).toLocaleString()
 	}
 
-	// Simulated actions
-	const addTask = () => alert('TODO: Add task form/modal')
-	const editTask = (task) => alert(`TODO: Edit task ${task.id}`)
+	const addTask = () => {
+		router.push(`/tasks/create`)
+	}
+
+	const editTask = (id) => {
+		router.push(`/tasks/${id}/edit`)
+	}
+
 	const deleteTaskItem = async (id) => {
 		try {
 			if (!confirm('Are you sure?')) return

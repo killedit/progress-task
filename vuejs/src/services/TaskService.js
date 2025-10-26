@@ -10,6 +10,22 @@ axios.interceptors.request.use(config => {
   return config;
 });
 
+export const getUsers = () => {
+	return axios.get(`${API_URL}/users`, {
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem('token')}`
+		}
+	})
+}
+
+export const getTask = (id) => {
+	return axios.get(`${API_URL}/tasks/${id}`, {
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem('token')}`
+		}
+	})
+}
+
 export async function getTasks(page = 1) {
   const response = await axios.get(`${API_URL}/tasks?page=${page}`, {
     headers: authHeader(),

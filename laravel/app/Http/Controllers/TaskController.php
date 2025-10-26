@@ -6,20 +6,28 @@ use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class TaskController extends Controller
 {
     public function index(Request $request)
     {
-// dd("here");
-        Log::info('Tasks API called');
+        $query = Task::with(['assignedUser', 'createdByUser']);
 
-        // If user logged in, show their tasks only; otherwise all
         if (Auth::check()) {
-            return Task::where('assigned_to', Auth::id())->paginate(10);
+            $userId = Auth::id();
+
+            $query->where(function ($q) use ($userId) {
+                $q->where('tasks.assigned_to', $userId)
+                  ->orWhere('tasks.created_by', $userId);
+            });
+
+            $query->toSql();
+            $query->getBindings();
         }
 
-        return Task::paginate(10);
+        return $query->paginate(10);
     }
 
     public function store(Request $request)
@@ -31,8 +39,11 @@ class TaskController extends Controller
             'assigned_to' => 'nullable|integer|exists:users,id',
         ]);
 
-        $data['assigned_by'] = Auth::id() ?? null;
+        // $data['created_by'] = Auth::id() ?? null;
+        $data['created_by'] = auth()->id();
         $data['is_completed'] = false;
+
+// dd($data);
 
         $task = Task::create($data);
 
@@ -44,12 +55,28 @@ class TaskController extends Controller
         return response()->json($task);
     }
 
+    public function create(Task $task)
+    {
+        $users = User::all();
+        return view('tasks.form', compact('users'));
+    }
+
     public function update(Request $request, Task $task)
     {
-        $data = $request->only(['title', 'description', 'due_date', 'is_completed']);
-        $task->update($data);
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'due_date' => 'nullable|date',
+            'assigned_to' => 'nullable|integer|exists:users,id',
+            'is_completed' => 'boolean',
+        ]);
 
-        return response()->json(['message' => 'Task updated successfully.']);
+        $task->update($validated);
+
+        return response()->json([
+            'message' => 'Task updated successfully',
+            'task' => $task->load(['assignedUser', 'createdByUser']),
+        ]);
     }
 
     public function destroy(Task $task)
