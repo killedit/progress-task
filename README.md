@@ -18,6 +18,7 @@ Creating new users is possible and recommended, but not not necessary to test fu
 `http://127.0.0.1:8007/`
 
 ![Web application landingpage](laravel/resources/images/2025-10-25-progress-task-landing-page.png)
+![Web application logged-in](laravel/resources/images/2025-10-25-progress-task-logged-in.png)
 
 ## Overall project structure:
 
@@ -58,8 +59,9 @@ Creating new users is possible and recommended, but not not necessary to test fu
 `/laravel/postman/2025-10-25-progress-task-environment.json` </br>
 `/laravel/postman/2025-10-20-progress-task-postman_collection.json`
 
-![Postman collection](laravel/resources/images/2025-10-25-progress-task-postman-collection.png)
-![Postman environemtn](laravel/resources/images/2025-10-25-progress-task-postman-environment.png)
+![Postman collection](laravel/resources/images/2025-10-25-progress-task-postman-collection.png) 
+![Postman environemtn](laravel/resources/images/2025-10-25-progress-task-postman-environment.png) 
+![Postman PUT method](laravel/resources/images/2025-10-25-progress-task-postman-collection-put-method.png) 
 
 2. Run curls in the terminal:
 ```

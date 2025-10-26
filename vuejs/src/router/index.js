@@ -12,6 +12,7 @@ const routes = [
   { path: '/tasks', name: 'Tasks', component: Tasks, meta: { requiresAuth: true }},
   { path: '/tasks/create', component: TaskForm },
   { path: '/tasks/:id/edit', component: TaskForm, props: true },
+  { path: '/register', name:'Register', component: Register },
 ];
 
 const router = createRouter({

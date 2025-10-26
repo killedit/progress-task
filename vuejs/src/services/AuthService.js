@@ -24,3 +24,7 @@ export const authHeader = () => {
   const token = localStorage.getItem('token')
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
+
+export const registerUser = async (userData) => {
+  return await axios.post(`${API_URL}/register`, userData)
+}
