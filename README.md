@@ -23,6 +23,7 @@ Creating new users is possible and recommended, but not not necessary to test fu
 ## Connect to the database
 
 Option 1: Connect to `progress_mysql` container:
+
 ```
 docker exec -it progress_mysql bash
 mysql -u root -p
@@ -31,8 +32,10 @@ use progress;
 show tables;
 ...
 ```
+
 Option 2: Create a new db connection in DBeaver.
 
+```
 Server Host:    127.0.0.1
 Port:           3307
 Database:       progress
@@ -44,7 +47,7 @@ Driver properties:
     useSSL                      FALSE
 
 Test Connection...
-
+```
 
 ## Overall project structure:
 
@@ -78,7 +81,7 @@ Test Connection...
 | `DELETE` | `/api/tasks/{id}`          | TaskController@destroy  | Delete task (only if user owns or created it).                 |
 | `PATCH`  | `/api/tasks/{id}/complete` | TaskController@complete | Mark a task as completed (only if user owns or created it).    |
 
-### Way to test the API endpoints:
+### How to test the API endpoints:
 
 1. To run tests import the Postman collection and enviroment from Laravel folder:
 
@@ -89,7 +92,8 @@ Test Connection...
 ![Postman environemtn](laravel/resources/images/2025-10-25-progress-task-postman-environment.png) 
 ![Postman PUT method](laravel/resources/images/2025-10-25-progress-task-postman-collection-put-method.png) 
 
-2. Run Curls in the terminal:
+2. Curl requests in the terminal:
+
 ```
 curl -v -X POST 'http://127.0.0.1:8007/api/login' -H 'Content-Type: application/json' -d '{"email":"test@example.com","password":"test123"}'
 
@@ -104,6 +108,7 @@ curl -v -X GET 'http://127.0.0.1:8007/api/tasks' -H 'Accept: application/json' -
 http://127.0.0.1:8007/api                           ← If opened in the browser should show "API is running".
 http://127.0.0.1:8007/api/tasks
 ```
+
 ## Integration Testing
 Due to the size I have decide to run integration test to check the functionality of the application. Whether user can login and register, create and delete tasks, ect.
 
@@ -127,5 +132,6 @@ Things to improve:
 - The technical debt - format, clean up and optimize code! Time limit was short, what could have gone wrong, did go wrong:]
 - Create a swagger with OpenAPI for the REST API resources. Only Postman collection and environment are provided with the project.
 - For convenience `.env` files are in project. The `.env` file should NOT be in repository. Secret management services should be used like environment variables in CI/CD platforms, Docker secrets, etc.
+- Some tests for the front-end. It was tested just manually.
 - The queries could be improved. In addition haivng an option to soft delete records - `del` of type enum('no','yes') and information about who modified a record and how many times a records was modified will be nice.
 - Let users manipulate only tasks they have created or they are assigned to.
