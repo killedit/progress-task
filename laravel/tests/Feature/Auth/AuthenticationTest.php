@@ -10,38 +10,47 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
+    public function test_users_can_authenticate_using_api(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->post('/login', [
+        $response = $this->post('/api/login', [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
+        $response->assertStatus(200);
         $this->assertAuthenticated();
-        $response->assertNoContent();
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         $user = User::factory()->create();
 
-        $this->post('/login', [
+        $response = $this->postJson('/api/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
 
+        $response->assertStatus(401);
         $this->assertGuest();
     }
 
-    public function test_users_can_logout(): void
+    public function test_users_can_logout_via_api(): void
     {
-        $user = User::factory()->create();
+         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post('/logout');
+        // Create a token directly instead of logging in
+        $token = $user->createToken('test-token')->plainTextToken;
 
-        $this->assertGuest();
+        // Verify token was created
+        $this->assertDatabaseCount('personal_access_tokens', 1);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/logout');
+
         $response->assertNoContent();
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 }
