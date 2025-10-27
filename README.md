@@ -20,6 +20,32 @@ Creating new users is possible and recommended, but not not necessary to test fu
 ![Web application landingpage](laravel/resources/images/2025-10-25-progress-task-landing-page.png)
 ![Web application logged-in](laravel/resources/images/2025-10-25-progress-task-logged-in.png)
 
+## Connect to the database
+
+Option 1: Connect to `progress_mysql` container:
+```
+docker exec -it progress_mysql bash
+mysql -u root -p
+    admin123
+use progress;
+show tables;
+...
+```
+Option 2: Create a new db connection in DBeaver.
+
+Server Host:    127.0.0.1
+Port:           3307
+Database:       progress
+Username:       laravel_user
+Password:       user123
+
+Driver properties:
+    allowPublicKeyRetrieval     TRUE
+    useSSL                      FALSE
+
+Test Connection...
+
+
 ## Overall project structure:
 
 ```
@@ -92,6 +118,10 @@ php artisan migrate:fresh --env=testing
 php artisan test
 ```
 ![Postman Integration Tests](laravel/resources/images/2025-10-25-progress-task-integration-tests.png) 
+
+There's a lot to be desired when it comes to code coverage:
+
+![Postman Xdebug](laravel/resources/images/2025-10-25-progress-task-xdebug.png) 
 
 Things to improve:
 - The technical debt - format, clean up and optimize code! Time limit was short, what could have gone wrong, did go wrong:]
