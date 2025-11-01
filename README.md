@@ -6,7 +6,7 @@ Only logged in users can add/edit/delete/assign/complete a task.</br>
 ## Setup
 ```
 git clone https://github.com/killedit/2025-10-25-progress-task.git
-cd 2025-10-25-progress-task
+cd progress-task
 docker compose up -d --build
 ```
 If you want to follow the docker container logs remove the `-d` flad so you don't detach at the build process.
@@ -15,7 +15,7 @@ The application should run migrations and seeders.</br>
 There are two example users `test@example.com` with password `test123` and `user@example.com` with password `user123`.</br>
 Creating new users is possible and recommended, but not not necessary to test functionality.
 
-`http://127.0.0.1:8007/`
+`http://127.0.0.1:8087/`
 
 ![Web application landingpage](laravel/resources/images/2025-10-25-progress-task-landing-page.png)
 ![Web application logged-in](laravel/resources/images/2025-10-25-progress-task-logged-in.png)
@@ -110,7 +110,7 @@ http://127.0.0.1:8007/api/tasks
 ```
 
 ## Integration Testing
-Due to the size I have decide to run integration test to check the functionality of the application. Whether user can login and register, create and delete tasks, ect.
+Due to the size of the application I have decide to run only integration tests to check the functionality of the application. Whether user can login and register, create and delete tasks, ect.
 
 Attach to Laravel container:
 ```
