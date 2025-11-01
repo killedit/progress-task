@@ -5,7 +5,7 @@ Only logged in users can add/edit/delete/assign/complete a task.</br>
 
 ## Setup
 ```
-git clone https://github.com/killedit/2025-10-25-progress-task.git
+git clone https://github.com/killedit/progress-task.git
 cd progress-task
 docker compose up -d --build
 ```
