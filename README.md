@@ -125,6 +125,10 @@ php artisan test
 ![Postman Integration Tests](laravel/resources/images/2025-10-25-progress-task-integration-tests.png) 
 
 There's a lot to be desired when it comes to code coverage:
+```
+vendor/bin/phpunit --coverage-html=storage/coverage
+XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text
+```
 
 ![Postman Xdebug](laravel/resources/images/2025-10-25-progress-task-xdebug.png) 
 

@@ -18,7 +18,7 @@ COPY laravel/composer.json composer.json
 COPY laravel/composer.lock composer.lock
 
 # Disable artisan scripts during build (they need env)
-RUN composer install --no-scripts --no-dev --optimize-autoloader --prefer-dist
+RUN composer install --no-scripts --optimize-autoloader --prefer-dist
 
 # Copy the rest of the Laravel application
 COPY laravel/ .
