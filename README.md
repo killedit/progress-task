@@ -132,6 +132,10 @@ XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text
 
 ![Postman Xdebug](laravel/resources/images/2025-10-25-progress-task-xdebug.png) 
 
+Test result are in: </br>
+`/storage/coverage/index.html` </br>
+`/storage/coverage/dashboard.html`
+
 Things to improve:
 - The technical debt - format, clean up and optimize code! Time limit was short, what could have gone wrong, did go wrong:]
 - Create a swagger with OpenAPI for the REST API resources. Only Postman collection and environment are provided with the project.
