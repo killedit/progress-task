@@ -60,9 +60,6 @@ onMounted(async () => {
   try {
     // Load users for dropdown
     const response = await getUsers()
-
-console.log("TaskForm loaded users:", response.data);
-
     users.value = response.data
 
     // If editing, load task data

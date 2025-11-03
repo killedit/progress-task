@@ -13,11 +13,8 @@ done
 echo "MySQL is ready. Running migrations and seeders..."
 
 # Run migrations and seeders safely
-if [ ! -f /var/www/html/.laravel_initialized ]; then
-  php artisan migrate --force || true
-  php artisan db:seed --force || true
-  touch /var/www/html/.laravel_initialized
-fi
+php artisan migrate --force || true
+php artisan db:seed --force || true
 
 # Create the storage symlink if missing
 if [ ! -L "public/storage" ]; then

@@ -11,9 +11,6 @@ axios.interceptors.request.use(config => {
 });
 
 export const getUsers = () => {
-
-console.log(localStorage.getItem('token'));
-
 	return axios.get(`${API_URL}/users`, {
 		headers: {
 			Authorization: `Bearer ${localStorage.getItem('token')}`
