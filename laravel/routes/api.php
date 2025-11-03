@@ -28,6 +28,9 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->get('/users', function() {
+
+    // dd("API /users route called");
+
     return \App\Models\User::all();
 });
 
