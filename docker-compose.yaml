@@ -43,10 +43,8 @@ services:
     container_name: progress_vuejs
     restart: unless-stopped
     ports:
-      # #UNCOMMENT
-      # - "8087:80" # Vue app served by Nginx
-      # #COMMENT OUT
-      - "8087:5173" # Vite dev server port
+      # - "8087:80" # PROD Vue app served by Nginx
+      - "8087:5173" # DEV Vite dev server port
     volumes:
       - ./vuejs:/app # only needed for live-editing
       - /app/node_modules  # Prevent host node_modules override
