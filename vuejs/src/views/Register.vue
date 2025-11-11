@@ -40,6 +40,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { registerUser } from '../services/AuthService'
+import { addNotification } from '../utils/notifications.js'
 
 const router = useRouter()
 const form = ref({
@@ -56,11 +57,22 @@ const register = async () => {
 		localStorage.setItem('token', response.data.access_token)
 		localStorage.setItem('user', JSON.stringify(response.data.user))
 
-		alert('Registration successful!')
+		addNotification('Registration successful!', 'success')
 		router.push('/')
 	} catch (err) {
 		console.error(err)
-		alert('Registration failed. Please check your input.')
+
+		addNotification('Registration failed!', 'error')
+
+		let message = 'Registration failed.'
+        if (err.response && err.response.data && err.response.data.errors) {
+            // Loop over each field's errors
+            Object.values(err.response.data.errors)
+                .flat()
+                .forEach(msg => {
+                    addNotification(msg, 'error')
+                })
+        }
 	}
 }
 </script>

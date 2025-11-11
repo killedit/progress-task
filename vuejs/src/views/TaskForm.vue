@@ -50,6 +50,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { getUsers, getTask, createTask, updateTask } from '../services/TaskService'
 import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
+import { addNotification } from '../utils/notifications.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -93,24 +94,17 @@ const handleSubmit = async () => {
 	try {
         const payload = { ...form.value }
 
-        // if (payload.due_date) {
-		// 	payload.due_date = DateTime
-		// 		.fromJSDate(payload.due_date)
-		// 		.toUTC()
-		// 		.toISO({ suppressMilliseconds: true });
-		// }
-
 		if (isEdit.value) {
 			await updateTask(taskId, form.value)
-			alert('Task updated successfully!')
+			addNotification('Task updated successfully!', 'success')
 		} else {
 			await createTask(form.value)
-			alert('Task created successfully!')
+			addNotification('Task created successfully!', 'success')
 		}
 		router.push('/')
 	} catch (err) {
 		console.error('Failed to save task:', err)
-		alert('Failed to save task.')
+		addNotification('Failed to save task.', 'error')
 	}
 }
 </script>

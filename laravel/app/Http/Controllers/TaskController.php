@@ -53,6 +53,10 @@ class TaskController extends Controller
         $data['created_by'] = auth()->id();
         $data['is_completed'] = false;
 
+        if (!empty($data['due_date'])) {
+            $data['due_date'] = Carbon::parse($data['due_date'])->format('Y-m-d H:i:s');
+        }
+
         $task = Task::create($data);
 
         return response()->json($task, 201);
