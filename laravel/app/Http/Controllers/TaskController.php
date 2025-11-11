@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-// use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\User;
+use Carbon\Carbon;
 
 class TaskController extends Controller
 {
@@ -15,16 +15,26 @@ class TaskController extends Controller
     {
         $query = Task::with(['assignedUser', 'createdByUser']);
 
-        if (Auth::check()) {
-            $userId = Auth::id();
+        $userId = null;
 
+        $authHeader = $request->header('Authorization');
+
+        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+            $token = substr($authHeader, 7);
+
+            $accessToken = PersonalAccessToken::findToken($token);
+
+            if ($accessToken && $accessToken->tokenable) {
+                $user = $accessToken->tokenable;
+                $userId = $user->id;
+            }
+        }
+
+        if ($userId) {
             $query->where(function ($q) use ($userId) {
                 $q->where('tasks.assigned_to', $userId)
                   ->orWhere('tasks.created_by', $userId);
             });
-
-            $query->toSql();
-            $query->getBindings();
         }
 
         return $query->paginate(10);
@@ -42,8 +52,6 @@ class TaskController extends Controller
         // $data['created_by'] = Auth::id() ?? null;
         $data['created_by'] = auth()->id();
         $data['is_completed'] = false;
-
-// dd($data);
 
         $task = Task::create($data);
 
@@ -70,6 +78,10 @@ class TaskController extends Controller
             'assigned_to' => 'nullable|integer|exists:users,id',
             'is_completed' => 'boolean',
         ]);
+
+        if (isset($validated['due_date'])) {
+            $validated['due_date'] = Carbon::parse($validated['due_date'])->format('Y-m-d H:i:s');
+        }
 
         $task->update($validated);
 

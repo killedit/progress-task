@@ -19,11 +19,22 @@ class Task extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'due_date' => 'datetime:Y-m-d\TH:i:sP', // ISO 8601 with timezone offset
+    ];
+
+
+    /**
+     * Get the user to whom the task is assigned.
+     */
     public function assignedUser()
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
+    /**
+     * Get the user who created the task.
+     */
     public function createdByUser()
     {
         return $this->belongsTo(User::class, 'created_by');

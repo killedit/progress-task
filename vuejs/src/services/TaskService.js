@@ -5,9 +5,9 @@ const API_URL = 'http://127.0.0.1:8007/api';
 
 axios.defaults.baseURL = API_URL;
 axios.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
+	const token = localStorage.getItem('token');
+	if (token) config.headers.Authorization = `Bearer ${token}`;
+	return config;
 });
 
 export const getUsers = () => {
@@ -27,11 +27,14 @@ export const getTask = (id) => {
 }
 
 export async function getTasks(page = 1) {
-  const response = await axios.get(`${API_URL}/tasks?page=${page}`, {
-    headers: authHeader(),
-    timeout: 10000,
-  })
-  return response.data
+	const token = localStorage.getItem('token');
+	const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+	const response = await axios.get(`${API_URL}/tasks?page=${page}`, {
+		headers,
+		timeout: 10000,
+	});
+	return response.data;
 }
 
 export async function createTask(task) {
