@@ -96,6 +96,7 @@ const user = ref({})
 import { ref, onMounted } from 'vue'
 import { getTasks, deleteTask, toggleCompleteTask } from '../services/TaskService'
 import { useRouter } from 'vue-router'
+import { addNotification } from '../utils/notifications.js'
 
 const isAuthenticated = ref(false)
 
@@ -147,6 +148,9 @@ const deleteTaskItem = async (id) => {
 	try {
 		if (!confirm('Are you sure?')) return
 		await deleteTask(id)
+		
+		addNotification('Task deleted successfully!', 'success')
+
 		await loadTasks()
 	} catch (err) {
 		console.error('Failed to delete task:', err)

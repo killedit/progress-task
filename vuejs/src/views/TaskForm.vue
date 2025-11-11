@@ -104,7 +104,18 @@ const handleSubmit = async () => {
 		router.push('/')
 	} catch (err) {
 		console.error('Failed to save task:', err)
+		
 		addNotification('Failed to save task.', 'error')
+
+		let message = 'Registration failed.'
+        if (err.response && err.response.data && err.response.data.errors) {
+            // Loop over each field's errors
+            Object.values(err.response.data.errors)
+                .flat()
+                .forEach(msg => {
+                    addNotification(msg, 'error')
+                })
+        }
 	}
 }
 </script>
