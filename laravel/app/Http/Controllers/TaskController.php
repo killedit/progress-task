@@ -9,8 +9,30 @@ use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\User;
 use Carbon\Carbon;
 
+/**
+ * @OA\Info(
+ *      title="Progress Task API",
+ *      version="1.0.0",
+ *      description="Documentation for Progress Task REST API"
+ * ),
+ * @OA\Server(
+ *      url="http://127.0.0.1:8007",
+ *      description="Local server"
+ * )
+ */
 class TaskController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/tasks",
+     *     summary="List all tasks",
+     *     tags={"Tasks"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation"
+     *     )
+     * )
+     */
     public function index(Request $request)
     {
         $query = Task::with(['assignedUser', 'createdByUser']);
@@ -40,6 +62,55 @@ class TaskController extends Controller
         return $query->paginate(10);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/tasks",
+     *     security={{"bearerAuth":{}}},
+     *     summary="Create a new task",
+     *     tags={"Tasks"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"title"},
+     *             @OA\Property(property="title", type="string", example="Example task"),
+     *             @OA\Property(property="description", type="string", example="Example task description"),
+     *             @OA\Property(property="due_date", type="string", example="2025-10-20, 15:30:00"),
+     *             @OA\Property(property="assigned_to", type="integer", example=2)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Task created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example=9),
+     *             @OA\Property(property="title", type="string", example="Example task"),
+     *             @OA\Property(property="description", type="string", example="Example task description"),
+     *             @OA\Property(property="due_date", type="string", example="2025-10-20 15:30:00"),
+     *             @OA\Property(property="assigned_to", type="integer", example=2),
+     *             @OA\Property(property="created_by", type="integer", example=1),
+     *             @OA\Property(property="is_completed", type="boolean", example=false),
+     *             @OA\Property(property="created_at", type="string", example="2025-11-12T14:28:10.000000Z"),
+     *             @OA\Property(property="updated_at", type="string", example="2025-11-12T14:28:10.000000Z")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation failed",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The title field is required."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="title",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The title field is required.")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -49,12 +120,17 @@ class TaskController extends Controller
             'assigned_to' => 'nullable|integer|exists:users,id',
         ]);
 
-        // $data['created_by'] = Auth::id() ?? null;
         $data['created_by'] = auth()->id();
         $data['is_completed'] = false;
 
         if (!empty($data['due_date'])) {
-            $data['due_date'] = Carbon::parse($data['due_date'])->format('Y-m-d H:i:s');
+            try {
+                $data['due_date'] = Carbon::parse($data['due_date'])->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                return response()->json([
+                    'message' => 'Invalid due_date format. Expected YYYY-MM-DD HH:MM:SS.'
+                ], 422);
+            }
         }
 
         $task = Task::create($data);

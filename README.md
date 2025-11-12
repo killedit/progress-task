@@ -15,10 +15,10 @@ The application should run migrations and seeders.</br>
 There are two example users `test@example.com` with password `test123` and `user@example.com` with password `user123`.</br>
 Creating new users is possible and recommended, but not not necessary to test functionality.</br>
 
-The back-end, Laravel Rest API, runs at:
+The back-end, Laravel Rest API, runs at:</br>
 `http://127.0.0.1:8007`
 
-The front-end, Vue App, runs at:
+The front-end, Vue App, runs at:</br>
 `http://127.0.0.1:8087/`
 
 This requires the use of `CORS`, cross-origin resource sharing. The browser makes preflight `OPTION` requests to the back-end, which should happen before any actuall request, to find out if that resource is allowed to be accessed. 
@@ -114,6 +114,11 @@ curl -v -X GET 'http://127.0.0.1:8007/api/tasks' -H 'Accept: application/json' -
 http://127.0.0.1:8007/api                           ← If opened in the browser should show "API is running".
 http://127.0.0.1:8007/api/tasks
 ```
+3. OpenAPI Swagger (in progress):
+
+The documentation is generated with `php artisan l5-swagger:generate` and accessible at: </br>
+`http://127.0.0.1:8007/api/documentation` </br>
+
 
 ## Integration Testing
 Due to the size of the application I have decide to run only integration tests to check the functionality of the application. Whether user can login and register, create and delete tasks, ect.
@@ -144,7 +149,7 @@ Test result are in: </br>
 
 Things to improve:
 - The technical debt - format, clean up and optimize code! Time limit was short, less than a week:]
-- Create a swagger with OpenAPI for the REST API resources. Only Postman collection and environment are provided with the project.
+- Finish the swagger documentaion. Postman collection and environment are provided for all REST API resources.
 - For convenience `.env` files are in project. The `.env` file should NOT be in the repository. Secret management services should be used like environment variables in CI/CD platforms, Docker secrets, etc.
 - Some tests for the front-end. It was tested just manually.
 - The queries could be improved. Also haivng an option to soft delete records - `del` of type enum('no','yes') and information about who modified a record and how many times a records was modified will be nice.
