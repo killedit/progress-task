@@ -13,9 +13,15 @@ If you want to follow the docker container logs remove the `-d` flad so you don'
 
 The application should run migrations and seeders.</br>
 There are two example users `test@example.com` with password `test123` and `user@example.com` with password `user123`.</br>
-Creating new users is possible and recommended, but not not necessary to test functionality.
+Creating new users is possible and recommended, but not not necessary to test functionality.</br>
 
+The back-end, Laravel Rest API, runs at:
+`http://127.0.0.1:8007`
+
+The front-end, Vue App, runs at:
 `http://127.0.0.1:8087/`
+
+This requires the use of `CORS`, cross-origin resource sharing. The browser makes preflight `OPTION` requests to the back-end, which should happen before any actuall request, to find out if that resource is allowed to be accessed. 
 
 ![Web application landingpage](laravel/resources/images/2025-10-25-progress-task-landing-page.png)
 ![Web application logged-in](laravel/resources/images/2025-10-25-progress-task-logged-in.png)
@@ -137,9 +143,8 @@ Test result are in: </br>
 `/storage/coverage/dashboard.html`
 
 Things to improve:
-- The technical debt - format, clean up and optimize code! Time limit was short, what could have gone wrong, did go wrong:]
+- The technical debt - format, clean up and optimize code! Time limit was short, less than a week:]
 - Create a swagger with OpenAPI for the REST API resources. Only Postman collection and environment are provided with the project.
-- For convenience `.env` files are in project. The `.env` file should NOT be in repository. Secret management services should be used like environment variables in CI/CD platforms, Docker secrets, etc.
+- For convenience `.env` files are in project. The `.env` file should NOT be in the repository. Secret management services should be used like environment variables in CI/CD platforms, Docker secrets, etc.
 - Some tests for the front-end. It was tested just manually.
-- The queries could be improved. In addition haivng an option to soft delete records - `del` of type enum('no','yes') and information about who modified a record and how many times a records was modified will be nice.
-- Let users manipulate only tasks they have created or they are assigned to.
+- The queries could be improved. Also haivng an option to soft delete records - `del` of type enum('no','yes') and information about who modified a record and how many times a records was modified will be nice.
