@@ -26,12 +26,16 @@ export const getTask = (id) => {
 	})
 }
 
-export async function getTasks(page = 1) {
+export async function getTasks(page = 1, perPage = 10) {
 	const token = localStorage.getItem('token');
 	const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-	const response = await axios.get(`${API_URL}/tasks?page=${page}`, {
+	const response = await axios.get('/tasks', {
 		headers,
+		params: {
+			page,
+			per_page: perPage,
+		},
 		timeout: 10000,
 	});
 	return response.data;

@@ -16,7 +16,8 @@
 			<div class="mb-3">
 				<label>Assign To</label>
 				<select v-model="form.assigned_to" class="form-select">
-					<option disabled value="">Select a user</option>
+					<!-- <option disabled value="">Select a user</option> -->
+					<option value=""></option>
 					<option v-for="user in users" :key="user.id" :value="user.id">
 						{{ user.name }}
 					</option>

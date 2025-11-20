@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\User;
 use Carbon\Carbon;
+use App\Http\Resources\TaskResource;
 
 /**
  * @OA\Info(
@@ -55,11 +56,21 @@ class TaskController extends Controller
         if ($userId) {
             $query->where(function ($q) use ($userId) {
                 $q->where('tasks.assigned_to', $userId)
-                  ->orWhere('tasks.created_by', $userId);
+                    ->orWhere('tasks.created_by', $userId);
             });
         }
 
-        return $query->paginate(10);
+        $perPage = (int) $request->query('per_page', 10);
+        $perPage = max(1, min($perPage, 50));
+
+        $tasks = $query
+            ->orderBy('created_at', 'asc')
+            ->paginate($perPage)
+            ->appends($request->query());
+        return TaskResource::collection($tasks)
+            ->response()
+            ->setStatusCode(200)
+        ;
     }
 
     /**
@@ -116,11 +127,11 @@ class TaskController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'due_date' => 'nullable|date',
+            'due_date' => 'nullable|string',
             'assigned_to' => 'nullable|integer|exists:users,id',
         ]);
 
-        $data['created_by'] = auth()->id();
+        $data['created_by'] = Auth::id();
         $data['is_completed'] = false;
 
         if (!empty($data['due_date'])) {
@@ -128,14 +139,16 @@ class TaskController extends Controller
                 $data['due_date'] = Carbon::parse($data['due_date'])->format('Y-m-d H:i:s');
             } catch (\Exception $e) {
                 return response()->json([
-                    'message' => 'Invalid due_date format. Expected YYYY-MM-DD HH:MM:SS.'
+                    'message' => 'Invalid due_date format.'
                 ], 422);
             }
+        } else {
+            $data['due_date'] = null;
         }
 
         $task = Task::create($data);
 
-        return response()->json($task, 201);
+        return new TaskResource($task);
     }
 
     public function show(Task $task)

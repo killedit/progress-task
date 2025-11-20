@@ -48,8 +48,8 @@
 					<td>{{ task.id }}</td>
 					<td>{{ task.title }}</td>
 					<td>{{ task.description }}</td>
-					<td>{{ task.assigned_user.name || task.assigned_to }}</td>
-					<td>{{ task.created_by_user.name || task.created_by }}</td>
+					<td>{{ task.assigned_user?.name || task.assigned_to }}</td>
+					<td>{{ task.created_by_user?.name || task.created_by }}</td>
 					<td>{{ formatDate(task.due_date) }}</td>
 					<td>
 						<span v-if="task.is_completed" class="badge bg-success">Yes</span>
@@ -57,15 +57,16 @@
 					</td>
 					<td>
 						<template v-if="isAuthenticated">
+							<div class="action-buttons">
+								<button class="btn btn-sm btn-warning" @click="editTask(task.id)">🖉 Edit</button>
 
-							<button class="btn btn-sm btn-warning me-2" @click="editTask(task.id)">🖉 Edit</button>
+								<button class="btn btn-sm btn-danger" @click="deleteTaskItem(task.id)">🗑 Delete</button>
 
-							<button class="btn btn-sm btn-danger" @click="deleteTaskItem(task.id)">🗑 Delete</button>
-
-							<button class="btn btn-sm" :class="task.is_completed ? 'btn-secondary' : 'btn-success'" @click="toggleComplete(task.id)">
-								<span v-if="!task.is_completed">Complete</span>
-								<span v-else>Undo Complete</span>
-							</button>
+								<button class="btn btn-sm" :class="task.is_completed ? 'btn-secondary' : 'btn-success'" @click="toggleComplete(task.id)">
+									<span v-if="!task.is_completed">🗹 Completed</span>
+									<span v-else>🗷 Incomplete</span>
+								</button>
+							</div>
 						</template>
 						<template v-else>
 							<small class="text-muted">Login to manage</small>
@@ -76,16 +77,23 @@
 		</table>
 
 		<!-- Pagination -->
-		<nav v-if="pagination.total > pagination.per_page" class="d-flex justify-content-center">
+		<nav v-if="pagination.last_page > 1" class="d-flex justify-content-center">
 			<ul class="pagination">
 				<li class="page-item" :class="{ disabled: !pagination.prev_page_url }">
-					<button class="page-link" @click="changePage(pagination.current_page - 1)">Previous</button>
+				<button class="page-link" @click="changePage(pagination.current_page - 1)">Previous</button>
 				</li>
+
+				<li v-for="page in pagination.last_page" :key="page"
+					class="page-item" :class="{ active: pagination.current_page === page }">
+				<button class="page-link" @click="changePage(page)">{{ page }}</button>
+				</li>
+
 				<li class="page-item" :class="{ disabled: !pagination.next_page_url }">
-					<button class="page-link" @click="changePage(pagination.current_page + 1)">Next</button>
+				<button class="page-link" @click="changePage(pagination.current_page + 1)">Next</button>
 				</li>
 			</ul>
 		</nav>
+
 	</div>
 </template>
 
@@ -98,20 +106,36 @@ import { getTasks, deleteTask, toggleCompleteTask } from '../services/TaskServic
 import { useRouter } from 'vue-router'
 import { addNotification } from '../utils/notifications.js'
 
+const TASKS_PER_PAGE = 10
+
 const isAuthenticated = ref(false)
 
 const tasks = ref([])
-const pagination = ref({})
+const pagination = ref({
+	current_page: 1,
+	last_page: 1,
+	per_page: TASKS_PER_PAGE,
+	total: 0,
+	next_page_url: null,
+	prev_page_url: null
+})
 const loading = ref(true)
 const router = useRouter()
 
 const loadTasks = async (page = 1) => {
 	try {
 		loading.value = true
-		const data = await getTasks(page)
+		const data = await getTasks(page, TASKS_PER_PAGE)
 
 		tasks.value = data.data
-		pagination.value = data
+		pagination.value = {
+			current_page: data.meta?.current_page ?? page,
+			last_page: data.meta?.last_page ?? 1,
+			per_page: data.meta?.per_page ?? TASKS_PER_PAGE,
+			total: data.meta?.total ?? data.data.length,
+			next_page_url: data.links?.next ?? null,
+			prev_page_url: data.links?.prev ?? null
+		}
 	} catch (err) {
 		console.error('Failed to load tasks:', err)
 	} finally {
@@ -120,6 +144,8 @@ const loadTasks = async (page = 1) => {
 }
 
 const changePage = (page) => {
+	const lastPage = pagination.value.last_page ?? 1
+	if (page < 1 || page > lastPage) return
 	loadTasks(page)
 }
 
@@ -193,5 +219,17 @@ onMounted(() => {
 <style>
 .container {
 	max-width: 900px;
+}
+
+.action-buttons {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 0.4rem;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+.action-buttons .btn {
+	white-space: nowrap;
 }
 </style>
