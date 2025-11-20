@@ -114,10 +114,13 @@ curl -v -X GET 'http://127.0.0.1:8007/api/tasks' -H 'Accept: application/json' -
 http://127.0.0.1:8007/api                           ← If opened in the browser should show "API is running".
 http://127.0.0.1:8007/api/tasks
 ```
-3. OpenAPI Swagger (in progress):
+3. OpenAPI Swagger (work in progress):
 
 The documentation is generated with `php artisan l5-swagger:generate` and accessible at: </br>
 `http://127.0.0.1:8007/api/documentation` </br>
+
+![Swagger](laravel/resources/images/2025-10-25-progress-task-swagger.png)
+
 
 
 ## Integration Testing
