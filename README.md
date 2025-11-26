@@ -59,21 +59,21 @@ Test Connection...
 
 ```
 2025-10-20-progress-task
-├── /docker
-│   └── /nginx
-│       └── default.conf     <- Nginx configuration file for serving the application
-│   └── /php
-│       └── /conf.d
-│           └── xdebug.ini   <- PHP configuration for Xdebug
-├── /laravel                 <- Backend
-│   ├── Dockerfile           <- Dockerfile for the Laravel backend
-│   ├── .env                 <- Laravel specific environment variables - Laravel DB settings
-│   └── ...
-├── /vuejs                   <- Frontend
-│   ├── Dockerfile           <- Dockerfile for the Vue.js frontend
-│   └── ...
-├── docker-compose.yaml      <- This does the magic.
-├── .env                     <- main environment variables - MySQL docker container intialization
+├─ /docker
+│  ├─ /nginx
+│  │  └─ default.conf   <- Nginx configuration file for serving the application
+│  └─ /php
+│     └─ /conf.d
+│        └─ xdebug.ini  <- PHP configuration for Xdebug
+├─ /laravel             <- Backend
+│  ├─ Dockerfile        <- Dockerfile for the Laravel backend
+│  ├─ .env              <- Laravel specific environment variables - Laravel DB settings
+│  └─ ...
+├─ /vuejs               <- Frontend
+│  ├─ Dockerfile        <- Dockerfile for the Vue.js frontend
+│  └─ ...
+├─ docker-compose.yaml  <- This does the magic.
+├─ .env                 <- main environment variables - MySQL docker container initialization
 ```
 
 ## REST API resources
